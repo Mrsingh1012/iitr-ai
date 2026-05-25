@@ -73,6 +73,8 @@ results = collection.query(
     n_results=3,     # top-k
 )
 
+print(f"\nFirst User Query --> {user_query}\n")
+
 for i in range(len(results["ids"][0])):
     print(f"Rank {i+1}")
     print("  ID:",       results["ids"][0][i])
@@ -93,5 +95,6 @@ second_results = collection.query(
     n_results=2,     # smaller top-k this time
 )
 
+print(f"\nSecond User Query --> {second_query}\n")
 for i in range(len(second_results["ids"][0])):
     print(f"Rank {i+1}:", second_results["documents"][0][i])
