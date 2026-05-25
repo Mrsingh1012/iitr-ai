@@ -80,3 +80,18 @@ for i in range(len(results["ids"][0])):
     print("  Metadata:", results["metadatas"][0][i])
     if results.get("distances"):
         print("  Distance:", results["distances"][0][i])
+
+second_query = "How do I change my login password?"
+
+# Same model — never swap mid-lab
+second_embedding = model.encode(
+    [second_query], convert_to_numpy=True
+).tolist()
+
+second_results = collection.query(
+    query_embeddings=second_embedding,
+    n_results=2,     # smaller top-k this time
+)
+
+for i in range(len(second_results["ids"][0])):
+    print(f"Rank {i+1}:", second_results["documents"][0][i])
