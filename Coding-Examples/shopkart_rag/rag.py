@@ -50,3 +50,57 @@ EMBEDDING_MODEL_NAME = "BAAI/bge-small-en-v1.5"  # Free BGE model from Hugging F
 
 # LLM model name for generation — free Groq model; swap for any model Groq lists
 GENERATION_MODEL_NAME = "llama-3.3-70b-versatile"  # Groq-hosted LLM used as the generator
+
+
+def create_embedding_model() -> SentenceTransformer:
+    # Load the local BGE embedding model once — reuse for all encode calls in this script
+    return SentenceTransformer(EMBEDDING_MODEL_NAME)  # Downloads ~130MB BGE model on first run
+
+
+def setup_chroma_collection():
+    # Connect to on-disk Chroma storage in ./chroma_store (survives after script ends)
+    client = chromadb.PersistentClient(path="./chroma_store")  # Local persistent database folder
+
+    # Open or create the ShopKart policy collection — separate name from older demo collections
+    collection = client.get_or_create_collection(
+        name="shopkart_policy_kb",  # Named bucket for ShopKart policy rows
+        embedding_function=None,  # We pass embeddings manually — same teaching pattern as before
+    )
+
+    return collection  # Return collection handle for upsert and query
+
+
+def index_policy_records(collection, model: SentenceTransformer) -> None:
+    # Build parallel lists from POLICY_RECORDS — index alignment matters for upsert
+    ids = [row["id"] for row in POLICY_RECORDS]  # One unique id per policy chunk
+    documents = [row["text"] for row in POLICY_RECORDS]  # Plain text stored and returned in search
+    metadatas = [row["metadata"] for row in POLICY_RECORDS]  # Category and source tags per row
+
+    # Encode all policy texts to vectors in one batch — same model as queries later
+    # normalize_embeddings=True is recommended for BGE so cosine-style similarity behaves well
+    embeddings = model.encode(documents, convert_to_numpy=True, normalize_embeddings=True).tolist()  # Chroma expects Python lists
+
+    # Write all rows into Chroma — upsert is safe to rerun (updates by id if already present)
+    collection.upsert(
+        ids=ids,  # Primary keys
+        documents=documents,  # Readable policy sentences
+        metadatas=metadatas,  # Tags stored alongside each row
+        embeddings=embeddings,  # Meaning vectors used for similarity search
+    )
+
+    print(f"Indexed {collection.count()} ShopKart policy records.")  # Expect 4 after first successful run
+
+
+def main() -> None:
+    # Load the embedding model once and reuse it for the whole run
+    model = create_embedding_model()  # Local BGE encoder
+
+    # Open (or create) the persistent Chroma collection on disk
+    collection = setup_chroma_collection()  # Handle for storing/searching vectors
+
+    # Encode every policy record and write all embeddings into ChromaDB
+    index_policy_records(collection, model)  # Persists ids, documents, metadata, embeddings
+
+
+if __name__ == "__main__":
+    main()  # Run the indexing pipeline when this file is executed directly
