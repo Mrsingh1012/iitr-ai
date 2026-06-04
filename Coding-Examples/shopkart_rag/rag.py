@@ -1,6 +1,7 @@
 # shopkart_rag.py — minimal RAG loop for ShopKart customer support
 
 import os  # Read environment variables like GROQ_API_KEY
+from typing import Any, Dict, List  # Type hints for the retriever's return value
 import chromadb  # Vector database for storing and searching policy chunks
 from sentence_transformers import SentenceTransformer  # Loads the BGE embedding model for retriever
 from groq import Groq  # Client for LLM generation API calls (free, OpenAI-compatible)
@@ -91,6 +92,41 @@ def index_policy_records(collection, model: SentenceTransformer) -> None:
     print(f"Indexed {collection.count()} ShopKart policy records.")  # Expect 4 after first successful run
 
 
+def retrieve_policy_chunks(
+    collection,
+    model: SentenceTransformer,
+    user_query: str,
+    top_k: int = 2,
+) -> List[Dict[str, Any]]:
+    # Convert the customer's question into an embedding vector using the SAME BGE model as indexing
+    query_embedding = model.encode([user_query], convert_to_numpy=True, normalize_embeddings=True).tolist()  # Batch of one query
+
+    # Ask Chroma for the nearest stored policy vectors to this question vector
+    results = collection.query(
+        query_embeddings=query_embedding,  # Query as numbers — not raw string
+        n_results=top_k,  # How many chunks to return (top-k)
+        include=["documents", "metadatas", "distances"],  # Ask for text, tags, and scores
+    )
+
+    retrieved = []  # Clean list we will pass to the generator
+
+    # Loop through each rank in the top-k result lists — index 0 is best match
+    for doc, meta, dist in zip(
+        results["documents"][0],  # Matched policy text strings
+        results["metadatas"][0],  # Metadata dicts aligned with each match
+        results["distances"][0],  # Distance scores — lower usually means closer meaning
+    ):
+        retrieved.append(
+            {
+                "text": doc,  # Policy excerpt text
+                "metadata": meta,  # Source and category labels
+                "distance": dist,  # Similarity score for inspection
+            }
+        )
+
+    return retrieved  # List of dicts — retriever output for this query
+
+
 def main() -> None:
     # Load the embedding model once and reuse it for the whole run
     model = create_embedding_model()  # Local BGE encoder
@@ -100,6 +136,17 @@ def main() -> None:
 
     # Encode every policy record and write all embeddings into ChromaDB
     index_policy_records(collection, model)  # Persists ids, documents, metadata, embeddings
+
+    # print("Count:", collection.count())  # Should be 4
+    # print("Peek sample:", collection.peek())  # Eyeball ids and document text
+
+    # Run a sample retrieval to confirm the stored embeddings are searchable
+    sample_query = "How many days do I have to return an item?"  # Example customer question
+    chunks = retrieve_policy_chunks(collection, model, sample_query, top_k=3)  # Nearest policy chunks
+
+    print(f"\nTop matches for: {sample_query}")  # Header for the retrieval output
+    for rank, chunk in enumerate(chunks, start=1):  # Walk results best-first
+        print(f"  {rank}. [{chunk['metadata']['category']}] (distance={chunk['distance']:.4f}) {chunk['text']}")  # Show tag, score, text
 
 
 if __name__ == "__main__":
