@@ -261,7 +261,7 @@ def main() -> None:
         collection=collection,  # Retriever storage
         model=model,  # Embedding model
         user_query=sample_query,  # Customer's natural-language question
-        top_k=3,  # Fetch three nearest policy chunks
+        top_k=2,  # Fetch three nearest policy chunks
     )
 
     print(f"\nGrounded answer:\n{sample_answer}")  # Final RAG output for the sample question
