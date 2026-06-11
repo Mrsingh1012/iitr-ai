@@ -235,6 +235,7 @@ def index_policy_chunks(
     )
 
     print(f"Indexed {collection.count()} chunks into {COLLECTION_NAME}.")  # Post-upsert count
+    print(f"PRINTING METADATA ----> {metadatas}")
 
 
 def build_knowledge_base(model, collection, folder_path: str = POLICY_FOLDER) -> None:
