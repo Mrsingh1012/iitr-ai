@@ -130,8 +130,8 @@ End-to-end, runnable projects that bring the RAG modules together — built arou
 3. **Take it further** — try the hands-on labs once you reach the RAG modules.
 
 ```bash
-git clone https://github.com/saksham20189575/iitr-ai.git
-cd iitr-ai
+git clone https://github.com/saksham20189575/generative-ai-notes.git
+cd generative-ai-notes
 ```
 
 ---
