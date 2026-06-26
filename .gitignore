@@ -1,0 +1,7 @@
+.cortex/
+.claude/
+__pycache__/
+*.pyc
+approved_drafts.json
+.streamlit/
+.DS_Store

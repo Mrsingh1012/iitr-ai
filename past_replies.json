@@ -1,0 +1,20 @@
+[
+  {
+    "thread_subject": "Q3 Budget Review",
+    "original_message": "Can you share the updated numbers for the Q3 budget review?",
+    "reply": "Sure, I've attached the updated Q3 budget spreadsheet. Key changes are in the marketing and R&D line items.",
+    "date": "2026-03-15"
+  },
+  {
+    "thread_subject": "Meeting reschedule",
+    "original_message": "I need to move our 2pm meeting to Thursday. Does that work?",
+    "reply": "Thursday at 2pm works for me. I'll update the calendar invite.",
+    "date": "2026-03-20"
+  },
+  {
+    "thread_subject": "Project timeline update",
+    "original_message": "The client wants to push the deadline to end of month. Thoughts?",
+    "reply": "We can make the end-of-month deadline if we add one more developer to the team for the final sprint.",
+    "date": "2026-04-01"
+  }
+]

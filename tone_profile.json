@@ -1,0 +1,13 @@
+{
+  "tone": "professional",
+  "formality": "moderate",
+  "greeting": "Hi {name},",
+  "sign_off": "Best regards,\n{name}",
+  "length": "concise",
+  "style_notes": [
+    "Be respectful and clear",
+    "Avoid jargon unless replying to technical people",
+    "Use positive language",
+    "Keep paragraphs short"
+  ]
+}
