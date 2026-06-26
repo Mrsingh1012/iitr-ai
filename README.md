@@ -56,7 +56,7 @@ By the end of this course you'll be able to:
 
 ## Curriculum
 
-The course is organized into **7 modules** and **24 topics**. Click any topic to open its notes.
+The course is organized into **8 modules** and **26 topics**. Click any topic to open its notes.
 
 ### Module 1 — Programming Foundations
 
@@ -116,6 +116,13 @@ The course is organized into **7 modules** and **24 topics**. Click any topic to
 |---|-------|:-----:|
 | 23 | Working with APIs and JSON | [Notes](07-Tools-and-External-Integrations/23-Working-with-APIs-and-JSON/) |
 | 24 | Tool Integration in AI Agents | [Notes](07-Tools-and-External-Integrations/24-Tool-Integration-in-AI-Agents/) |
+
+### Module 8 — LLM Frameworks & Local Models
+
+| # | Topic | Notes |
+|---|-------|:-----:|
+| 25 | Ollama & Local LLMs | [Notes](08-LLM-Frameworks-and-Local-Models/25-Ollama-and-Local-LLMs/) |
+| 26 | Introduction to LangChain | [Notes](08-LLM-Frameworks-and-Local-Models/26-Introduction-to-LangChain/) |
 
 ---
 
