@@ -10,3 +10,25 @@
 
 This repository is used for tracking all codes of the **Agentic AI Course**.
 
+## GMAI MCP Server
+
+A lightweight MCP-style server is included for inspecting a workspace tree and reading text files.
+
+Run it directly:
+
+```bash
+python -m gmai_mcp_server --root .
+```
+
+Run it in stdio mode for MCP-style JSON-RPC requests:
+
+```bash
+python -m gmai_mcp_server --stdio
+```
+
+Example request:
+
+```json
+{"jsonrpc":"2.0","id":1,"method":"tools/list"}
+```
+
