@@ -57,10 +57,10 @@ load_dotenv()  # Make OLLAMA_MODEL, OLLAMA_HOST, OLLAMA_TEMPERATURE available vi
 
 # Each get() has a DEFAULT so the script still runs if a key is missing. The default model
 # here is a TOOL-CAPABLE one — swap it in .env, never in code.
-MODEL_NAME = os.environ.get("OLLAMA_MODEL", "llama3.1")  # Tag from "ollama list", tool-capable
+MODEL_NAME = os.environ.get("OLLAMA_MODEL", "qwen2.5:0.5b")  # Tag from "ollama list", tool-capable
 BASE_URL = os.environ.get("OLLAMA_HOST", "http://localhost:11434")  # Where Ollama listens
 # Temperature arrives as a STRING from .env, so float() converts it. 0 = stable tool selection.
-TEMPERATURE = float(os.environ.get("OLLAMA_TEMPERATURE", "0"))  # Deterministic during testing
+TEMPERATURE = float(os.environ.get("OLLAMA_TEMPERATURE", "0.3"))  # Deterministic during testing
 
 
 # ===========================================================================
