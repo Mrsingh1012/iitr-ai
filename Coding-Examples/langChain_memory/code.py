@@ -50,6 +50,9 @@ from dotenv import load_dotenv  # Reads key=value pairs from .env so settings st
 from langchain_core.tools import tool  # @tool converts a Python function into a LangChain tool
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder  # prompt + placeholders
 from langchain_core.messages import HumanMessage, AIMessage  # typed messages for manual append
+
+# typing.Optional lets the tool accept a MISSING order id without crashing on validation.
+from typing import Optional  # order_id may be None when the model calls the tool with no id yet
 from langchain_core.chat_history import InMemoryChatMessageHistory  # per-session RAM history store
 from langchain_core.runnables.history import RunnableWithMessageHistory  # auto history wrapper
 
@@ -82,13 +85,17 @@ TEMPERATURE = float(os.environ.get("OLLAMA_TEMPERATURE", "0"))  # Deterministic 
 # A small in-memory dict stands in for a real orders database (RAM-only, like the tool demos).
 ORDERS = {  # order_id -> record
     "ORD101": {"status": "shipped"},  # sample shipped order from earlier demos
-    "ORD102": {"status": "cancelled"},  # sample cancelled order from earlier demos
+    "ORD102": {"status": "delivered"},  # sample cancelled order from earlier demos
 }
 
 
 @tool  # Register this function as a LangChain tool the agent can request.
-def get_order_status(order_id: str) -> str:  # A string ID in, a status string out
+def get_order_status(order_id: Optional[str] = None) -> str:  # ID (or None) in, a status string out
     """Use when the user asks for order status or tracking of a specific order ID."""  # WHEN to use
+    # A tool-calling model may invoke this with NO id (e.g. "What is my order ID?"). Pydantic would
+    # reject None for a required str BEFORE our logic runs, so we accept Optional[str] and guard here.
+    if not order_id:  # None or empty -> the model called us without an id to look up
+        return "No order ID provided. Please share your order ID (e.g. ORD101) so I can check it."
     order = ORDERS.get(order_id)  # Safe lookup — returns None for an unknown id
     if not order:  # Handle the not-found case INSIDE the tool, never crash
         return f"Order with ID {order_id} not found."  # Clear, model-readable message
@@ -133,7 +140,7 @@ def build_agent_executor() -> AgentExecutor:
     agent_executor = AgentExecutor(
         agent=agent,  # the decision layer we just built
         tools=tools,  # the SAME tool list
-        verbose=True,  # stream internal execution logs for tracing
+        verbose=False,  # stream internal execution logs for tracing
         max_iterations=3,  # keep the bounded-loop idea from Session 29
         handle_parsing_errors=True,  # a parsing hiccup becomes recoverable, not a crash
     )
@@ -247,12 +254,15 @@ def demo_automatic_memory() -> None:
     print("STAGE 5 — AUTOMATIC history (RunnableWithMessageHistory)")
 
     session_a = "user-001"  # first customer's conversation
+    print("Session A, HUMAN INPUT Turn 1: Hi, my order ID is ORD101.")
     print("Session A, Turn 1:", ask_agent_auto(session_a, "Hi, my order ID is ORD101."))
     # "it" resolves from session A's own history -> the tool runs with ORD101.
+    print("Session A, HUMAN INPUT Turn 2: What is the status of it?") 
     print("Session A, Turn 2:", ask_agent_auto(session_a, "What is the status of it?"))
 
     session_b = "user-002"  # a DIFFERENT customer — must not see session A's ID
     # Correct wiring means session B has no knowledge of ORD101; the agent should ask for an id.
+    print("Session B, HUMAN INPUT Turn 1: What is my order ID?")
     print("Session B, Turn 1:", ask_agent_auto(session_b, "What is my order ID?"))
 
     # Peek at the stored histories to SEE that sessions are isolated in RAM.
