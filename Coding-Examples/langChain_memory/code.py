@@ -43,11 +43,6 @@
 # Standard library — read configuration from the environment after .env is loaded.
 import os  # os.environ.get(...) pulls values that load_dotenv() placed there
 
-# RunnableWithMessageHistory is "soft deprecated" — LangChain still ships and supports it, but
-# nudges you toward LangGraph persistence. This file TEACHES that wrapper on purpose (Stage 5),
-# so we suppress ONLY that one message and leave every other warning visible.
-from langchain_core._api import LangChainDeprecationWarning  # the specific warning category
-
 # python-dotenv — bridges a .env file on disk into os.environ at runtime.
 from dotenv import load_dotenv  # Reads key=value pairs from .env so settings stay out of code
 
@@ -146,7 +141,7 @@ def build_agent_executor() -> AgentExecutor:
         agent=agent,  # the decision layer we just built
         tools=tools,  # the SAME tool list
         verbose=False,  # stream internal execution logs for tracing
-        max_iterations=3,  # keep the bounded-loop idea from Session 29
+        max_iterations=1,  # keep the bounded-loop idea from Session 29
         handle_parsing_errors=True,  # a parsing hiccup becomes recoverable, not a crash
     )
     return agent_executor
@@ -300,7 +295,7 @@ def main() -> None:
     #   4) Change ONLY OLLAMA_TEMPERATURE in .env from 0 to 0.9 and compare stability — the
     #      Python never changes.
     print("=" * 72)
-    print("Edit .env (model, host, temperature) and re-run — the memory wiring stays the same.")
+    print("Edit .env (model, host, temperature) and re-run — the memory wiring stays the same.")xss
 
 
 if __name__ == "__main__":
