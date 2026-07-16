@@ -51,8 +51,10 @@ from dotenv import load_dotenv  # reads .env into os.environ before we check for
 load_dotenv()  # call once at import time so GROQ_API_KEY is available everywhere below
 
 # LangChain agent runtime + retriever-tool wrapper.
-from langchain.agents import AgentExecutor, create_tool_calling_agent  # managed tool-calling agent
-from langchain.tools.retriever import create_retriever_tool  # wrap a retriever as an agent tool
+# In LangChain 1.x the classic AgentExecutor/create_tool_calling_agent APIs moved out of
+# langchain.agents into the separate langchain-classic package (imported as langchain_classic).
+from langchain_classic.agents import AgentExecutor, create_tool_calling_agent  # managed tool-calling agent
+from langchain_classic.tools.retriever import create_retriever_tool  # wrap a retriever as an agent tool
 
 # LangChain vector store + loaders + splitter + model wrappers.
 from langchain_chroma import Chroma  # LangChain wrapper around the Chroma vector database
